@@ -126,6 +126,45 @@ public interface EstudianteRepositorio extends JpaRepository<Estudiante, String>
 
 
 
+package com.grupo5.API.servicio;
+
+import com.grupo5.API.entity.Estudiante;
+import com.grupo5.API.repository.EstudianteRepositorio;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class EstudianteService {
+
+    @Autowired
+    private EstudianteRepositorio repositorio;
+
+    public List<Estudiante> get() {
+        return repositorio.findAll();
+    }
+
+    public Optional<Estudiante> getId(String cedula) {
+        return repositorio.findById(cedula);
+    }
+
+    public Estudiante post(Estudiante estudiante) {
+        return repositorio.save(estudiante);
+    }
+
+    public void delete(String cedula) {
+        repositorio.deleteById(cedula);
+    }
+
+    public List<Estudiante> buscarPorNombre(String nombre) {
+        return repositorio.findByNombreContainingIgnoreCase(nombre);
+    }
+
+}
+
+
 
 package com.grupo5.API;
 
