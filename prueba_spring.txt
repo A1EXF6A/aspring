@@ -1,0 +1,156 @@
+tengo un proyecto en intellij idea que usa sprinboot
+tiene esta estructura
+
+scr
+ main/
+  java/
+   com.grupo5.API/
+    controller/
+     EstudianteController
+    entity/
+     Estudiante
+    repository/
+     EstudianteRepositorio
+    servicio/
+     EstudianteService
+    ApiApplication
+  resources/
+   templates/
+    index.html
+   application.properties
+
+codigo:
+package com.grupo5.API.controller;
+
+import com.grupo5.API.entity.Estudiante;
+import com.grupo5.API.servicio.EstudianteService;
+import jakarta.persistence.Id;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import java.util.List;
+
+
+@Controller
+public class EstudianteController {
+    @Autowired
+    private EstudianteService service;
+    @GetMapping("/")
+    public String index(Model model) {
+        model.addAttribute("estudiante",service.get());
+        return "index";
+    }
+
+    @GetMapping("/estudiante/nuevo")
+    public String formulario(Model model) {
+        model.addAttribute("estudiante",new Estudiante());
+        return "formulario";
+    }
+
+    @PostMapping("/estudiante")
+    public String guardar(@ModelAttribute Estudiante estudiante) {
+        service.post(estudiante);
+        return "redirect:/";
+    }
+
+    @GetMapping("/estudiante/editar/{cedula}")
+    public String editar(@PathVariable String cedula, Model model) {
+        Estudiante estudiante = service.getId(cedula).orElse(null);
+        model.addAttribute("estudiante",estudiante);
+        return "formulario";
+    }
+
+    @GetMapping("/estudiante/eliminar/{cedula}")
+    public String eliminar(@PathVariable String cedula) {
+        service.delete(cedula);
+        return "redirect:/";
+
+    }
+    @GetMapping("/estudiante/buscar")
+    public String buscarPorCedula(String cedula, Model model) {
+        Estudiante estudiante = service.getId(cedula).orElse(null);
+
+        if (estudiante != null) {
+            model.addAttribute("estudiante", List.of(estudiante)); // se envía como lista para reutilizar la tabla
+        } else {
+            model.addAttribute("estudiante", List.of()); // lista vacía si no se encuentra
+            model.addAttribute("mensaje", "No se encontró ningún estudiante con la cédula: " + cedula);
+        }
+
+        return "index";
+    }
+    @GetMapping("/estudiante/buscar/nombre")
+    public String buscarPorNombre(String nombre, Model model) {
+        List<Estudiante> resultados = service.buscarPorNombre(nombre);
+
+        if (!resultados.isEmpty()) {
+            model.addAttribute("estudiante", resultados);
+        } else {
+            model.addAttribute("estudiante", List.of());
+            model.addAttribute("mensaje", "No se encontraron estudiantes con el nombre: " + nombre);
+        }
+
+        return "index";
+    }
+
+
+}
+package com.grupo5.API.entity;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.Data;
+@Entity
+@Data
+@Table(name="estudiante")
+public class Estudiante {
+    @Id
+    private String cedula;
+    private String nombre;
+    private String apellido;
+    private String direccion;
+    private String telefono;
+}
+package com.grupo5.API.repository;
+
+import com.grupo5.API.entity.Estudiante;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
+public interface EstudianteRepositorio extends JpaRepository<Estudiante, String> {
+    List<Estudiante> findByNombreContainingIgnoreCase(String nombre);
+}
+
+
+
+
+package com.grupo5.API;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class ApiApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(ApiApplication.class, args);
+	}
+
+}
+spring.application.name=API
+
+spring.datasource.url=jdbc:mysql://localhost:3308/soa
+spring.datasource.username=root
+spring.datasource.password=
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.jpa.hibernate.ddl-auto=none
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+
+spring.thymeleaf.prefix=classpath:/templates/
+spring.thymeleaf.suffix=.html
+server.port=8081
+

@@ -1,0 +1,31 @@
+tengo un proyecto en intellij idea que usa sprinboot,
+generame un servicio que permita crear trabajadores, crear oficinas y asignar un trabajador en las oficinas
+los trabajadores tienen cedula y nombre
+las oficinas codigo y direccion
+tabla intermedia cedula y codigo
+tambien que se pueda buscar la oficina en la que esta un trabajador
+tiene esta estructura
+
+scr
+ main/
+  java/
+   com.grupo5.API/
+    ApiApplication
+  resources/
+   templates/
+    index.html
+   application.properties
+
+spring.application.name=API
+
+spring.datasource.url=jdbc:mysql://localhost:3308/soa
+spring.datasource.username=root
+spring.datasource.password=
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.jpa.hibernate.ddl-auto=none
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+
+spring.thymeleaf.prefix=classpath:/templates/
+spring.thymeleaf.suffix=.html
+server.port=8081
